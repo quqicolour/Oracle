@@ -5,23 +5,25 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@api3/contracts/interfaces/IApi3ReaderProxy.sol";
 
 contract API3PriceData is Ownable {
-
-    constructor(address _owner)Ownable(_owner) {
-
-    }
+    constructor() Ownable(msg.sender) {}
 
     //Determine if the API3 proxy is valid.
     mapping(address => bool) public validAPI3Proxy;
 
-    function setApi3Proxy(address[] calldata api3Proxys, bool[] calldata status) external onlyOwner {
+    function setApi3Proxy(
+        address[] calldata api3Proxys,
+        bool[] calldata status
+    ) external onlyOwner {
         unchecked {
-            for(uint256 i; i<api3Proxys.length; i++) {
+            for (uint256 i; i < api3Proxys.length; i++) {
                 validAPI3Proxy[api3Proxys[i]] = status[i];
             }
         }
     }
 
-    function readAPI3PriceVaule(address api3Proxy) external view returns (int224 value, uint256 timestamp) {
+    function readAPI3PriceVaule(
+        address api3Proxy
+    ) external view returns (int224 value, uint256 timestamp) {
         require(validAPI3Proxy[api3Proxy], "Invalid api3 proxy");
         (value, timestamp) = IApi3ReaderProxy(proxy).read();
         // If you have any assumptions about `value` and `timestamp`, make sure
@@ -40,5 +42,4 @@ contract API3PriceData is Ownable {
         // Refer to https://docs.api3.org/dapps/integration/contract-integration.html
         // for more information about how to integrate your contract securely.
     }
-    
 }
